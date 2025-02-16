@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petroleum Project</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://source.unsplash.com/1600x900/?oil,petroleum') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            max-width: 600px;
+            margin: auto;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .submit-button {
+            background-color: #007BFF;
+        }
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+        .prev-button {
+            background-color: black;
+        }
+        .prev-button:hover {
+            background-color: #333;
+        }
+        .next-button {
+            background-color: green;
+        }
+        .next-button:hover {
+            background-color: #006400;
+        }
+        .login-button {
+            background-color: black;
+            color: white;
+        }
+        .login-button:hover {
+            background-color: #333;
+        }
+        .register-button {
+            background-color: red;
+            color: white;
+        }
+        .register-button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body onload="showLogin()">
+    <div id="loginContainer" class="container">
+        <h1>Login or Register</h1>
+        <input type="text" id="username" placeholder="Enter your name" required>
+        <input type="password" id="password" placeholder="Enter password" required>
+        <button class="register-button" onclick="registerUser()">Register</button>
+        <button class="login-button" onclick="loginUser()">Login</button>
+    </div>
+
+    <div id="questionContainer" class="container" style="display: none;">
+        <h1>Fuel Refill</h1>
+        <p>How much fuel do you want to fill in your car?</p>
+        <input type="number" id="fuelAmount" placeholder="Enter amount in liters">
+        <button class="submit-button" onclick="calculateAmount()">Submit</button>
+        <div class="button-container">
+            <button class="prev-button" onclick="goBack()">Previous</button>
+            <button class="next-button" onclick="goToPayment()">Next</button>
+        </div>
+    </div>
+
+    <div id="paymentContainer" class="container" style="display: none;">
+        <h1>Payment</h1>
+        <p>Total Amount to be Paid: <span id="totalAmount">0</span> INR</p>
+        <button class="submit-button" onclick="makePayment()">Pay via UPI</button>
+    </div>
+
+    <script>
+        function showLogin() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('paymentContainer').style.display = 'none';
+        }
+
+        function registerUser() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            if (username.trim() === "" || password.trim() === "") {
+                alert("Please enter a username and password to continue.");
+                return;
+            }
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password);
+            alert("Registration successful! You can now login.");
+        }
+
+        function loginUser() {
+            let username = document.getElementById('username').value;
+            let password = document.getElementById('password').value;
+            let storedUsername = localStorage.getItem('username');
+            let storedPassword = localStorage.getItem('password');
+            
+            if (username === storedUsername && password === storedPassword) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('questionContainer').style.display = 'block';
+            } else {
+                alert("Invalid username or password. Please try again.");
+            }
+        }
+
+        function calculateAmount() {
+            let fuelAmount = document.getElementById('fuelAmount').value;
+            if (fuelAmount.trim() === "" || fuelAmount <= 0) {
+                alert("Please enter a valid fuel amount.");
+                return;
+            }
+            let pricePerLiter = 108.7;
+            let totalCost = fuelAmount * pricePerLiter;
+            localStorage.setItem('totalAmount', totalCost);
+            alert("You have successfully entered " + fuelAmount + " liters of fuel. Total cost: " + totalCost + " INR");
+        }
+
+        function goToPayment() {
+            let totalCost = localStorage.getItem('totalAmount');
+            if (!totalCost) {
+                alert("Please enter fuel amount first.");
+                return;
+            }
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('paymentContainer').style.display = 'block';
+            document.getElementById('totalAmount').innerText = totalCost;
+        }
+
+        function makePayment() {
+            let totalCost = localStorage.getItem('totalAmount');
+            alert("Redirecting to UPI payment for " + totalCost + " INR");
+            window.location.href = "upi://pay?pa=yourupiid@upi&pn=PetrolStation&mc=1234&tid=123456&tr=987654&tn=FuelPayment&am=" + totalCost + "&cu=INR";
+        }
+
+        function goBack() {
+            document.getElementById('paymentContainer').style.display = 'none';
+            document.getElementById('questionContainer').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
